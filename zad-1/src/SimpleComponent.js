@@ -1,41 +1,36 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 
-class SimpleComponent extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: null,
-      isLoading: false,
-    };
-  }
+/* Note: I added an import afterwards.
+  You can find the original solution in SimpleComponentFunction
+*/
 
-  async loadData() {
-    this.setState({ isLoading: true });
-    try {
-      const response = await fetch("https://randomuser.me/api/");
-      const data = await response.json();
+function SimpleComponent(props) {
+    const [data, setData] = useState(null);
+    const [isLoading, setLoading] = useState(false);
 
-      this.setState({ isLoading: false, data });
-    } catch (error) {
-      this.setState({ isLoading: false });
-    }
-  }
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch("https://randomuser.me/api/");
+            const data = await response.json();
 
-  componentDidMount() {
-    this.loadData();
-  }
-
-  render() {
-    if (this.state.isLoading) {
-      return <span>Loading</span>;
+            setData(data);
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
     }
 
-    if (this.state.data) {
-      return <span>{JSON.stringify(this.state.data)}</span>;
-    }
+    useEffect(() => {
+        loadData();
+    }, [data]);
 
-    return <span>Nothing</span>;
-  }
-}
+
+    return (
+        <div>
+            {isLoading ? <span>Loading</span> : data ? <span>{JSON.stringify(data)}</span> : <span>Nothing</span>}
+        </div>
+    );
+};
 
 export default SimpleComponent;
